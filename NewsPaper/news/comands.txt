@@ -1,0 +1,71 @@
+# Импорты моделей
+from django.contrib.auth.models import User
+from news.models import Author, Category, Post, PostCategory, Comment
+from django.utils import timezone
+
+# Создание двух пользователей
+user1 = User.objects.create_user(username='aziz')
+user2 = User.objects.create_user(username='abdi')
+
+# Создание двух объектов модели Author
+author1 = Author.objects.create(user=user1)
+author2 = Author.objects.create(user=user2)
+
+# Создание 4 категорий
+cat1 = Category.objects.create(name='спорт')
+cat2 = Category.objects.create(name='политика')
+cat3 = Category.objects.create(name='образование')
+cat4 = Category.objects.create(name='технологии')
+
+# Создание 2 статей и 1 новости
+post1 = Post.objects.create(author=author1, post_type='AR', h='Заголовок статьи 1', text='Текст статьи 1')
+post2 = Post.objects.create(author=author2, post_type='AR', h='Заголовок статьи 2', text='Текст статьи 2')
+post3 = Post.objects.create(author=author1, post_type='NW', h='Заголовок новости', text='Текст новости')
+
+# Присвоение категорий (одна статья/новость должна иметь 2 категории)
+PostCategory.objects.create(post=post1, category=cat1)
+PostCategory.objects.create(post=post1, category=cat2)
+PostCategory.objects.create(post=post2, category=cat3)
+PostCategory.objects.create(post=post3, category=cat4)
+
+# Создание 4 комментариев
+comment1 = Comment.objects.create(post=post1, udes=user2, text_comment='Комментарий к статье 1 от abdi')
+comment2 = Comment.objects.create(post=post2, udes=user1, text_comment='Комментарий к статье 2 от aziz')
+comment3 = Comment.objects.create(post=post3, udes=user2, text_comment='Комментарий к новости от abdi')
+comment4 = Comment.objects.create(post=post3, udes=user1, text_comment='Второй комментарий к новости от aziz')
+
+# Применение like/dislike к постам
+post1.like()
+post1.like()
+post2.like()
+post2.dislike()
+post3.like()
+
+# Применение like/dislike к комментариям
+comment1.like()
+comment2.dislike()
+comment3.like()
+comment4.like()
+comment4.like()
+
+# Обновление рейтингов авторов
+author1.update_rating()
+author2.update_rating()
+
+# Вывод лучшего пользователя
+best_author = Author.objects.order_by('-rating').first()
+print(f"Лучший пользователь: {best_author.user.username}, рейтинг: {best_author.rating}")
+
+# Вывод лучшего поста
+best_post = Post.objects.order_by('-reting').first()
+print(f"Дата: {best_post.datetime}")
+print(f"Автор: {best_post.author.user.username}")
+print(f"Рейтинг: {best_post.reting}")
+print(f"Заголовок: {best_post.h}")
+print(f"Превью: {best_post.preview()}")
+
+# Вывод всех комментариев к лучшему посту
+for comment in best_post.comment_set.all():
+    print(f"{comment.created_at} | {comment.udes.username} | Рейтинг: {comment.rating_comment}")
+    print(f"Текст: {comment.text_comment}")
+    print('---')
